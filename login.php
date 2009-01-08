@@ -4,7 +4,7 @@ require_once("dbconncet.php");
 
 $link = connect();
 
-$gen = new keyHandler($link);
+$gen = new keyHandler($link,'/configs/userAtuh.ini');
 
 $name = (isset($_POST['userName']))? $_POST['userName'] : '';
 $enc  = (isset($_POST['encrypt'])) ? $_POST['encrypt']  : '';

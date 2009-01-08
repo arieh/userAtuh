@@ -22,6 +22,11 @@
 require_once('dbaInterface.class.php');
 
 class userAuthDba implements dbaInterface {
+
+	/**
+	 * @var string location of the config file
+	 */
+	private $_configLocation = "configs/userAtuh.ini";
 	
 	/**
 	 * @var mysql_link a link to the database
@@ -36,14 +41,16 @@ class userAuthDba implements dbaInterface {
 	 
 	private $_configs = array();
 	
+	
 	/**
 	 * a constructor for the object
 	 * 
 	 * @param mysql_link $link a link to the database
 	 */
-    public function __construct(&$link){
+    public function __construct(&$link,$ini=''){
     	$this->_link = $link;
-    	$this->_configs = parse_ini_file("configs/userAtuh.ini");
+    	if (is_string($ini) && @file_exists($ini)) $this->_configs = parse_ini_file($ini);
+    	else $this->_configs = parse_ini_file($this->_configLocation);
     }
     
     /**

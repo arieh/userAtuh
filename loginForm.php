@@ -3,7 +3,7 @@ require_once("classes/keyHandler.class.php");
 require_once("dbconncet.php");
 
 $link = connect();
-$gen = new keyHandler($link);
+$gen = new keyHandler($link,'/configs/userAtuh.ini');
 $gen->generateKey();
 
 ?>
