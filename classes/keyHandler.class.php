@@ -25,6 +25,11 @@ require_once('userAuthDba.class.php');
 class keyHandler {
 
 	/**
+	 * @var int version number
+	 */
+	private $_version = 0.6;
+
+	/**
 	 * @var string a random key holder
 	 * @access private
 	 */
@@ -106,5 +111,13 @@ class keyHandler {
 			//check the hashed string with the key sent by the client side
 		return ($encodedPass==$encoded);
     }
+    
+    /**
+     * an accessor for version number
+     * 
+     * @return int version number
+     * @access static
+     */
+    static function version(){return $this->_version;}
 }
 ?>
