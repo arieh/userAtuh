@@ -100,6 +100,9 @@ class keyHandler {
     		//create a hashed string from the date collected
 		$encoded = sha1(sha1($pass.$name.$key));
 		
+			//generate a new key, so the last key won't be usable
+		$this->generateKey();
+		
 			//check the hashed string with the key sent by the client side
 		return ($encodedPass==$encoded);
     }

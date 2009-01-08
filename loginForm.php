@@ -5,6 +5,7 @@ require_once("dbconncet.php");
 $link = connect();
 $gen = new keyHandler($link);
 $gen->generateKey();
+
 ?>
 
 <script type='text/javascript' src='js/sha1.js'></script>

@@ -4,7 +4,6 @@ userAuth v.0.2
 Content of package:
 ===================
 1. classes
-1.a. config.php              : a config file for the users table structure
 1.b. userAuthDba.class.php   : an object for handling database related actions
 1.b.1 dbaInterface.class.php : an interface for the database object (to prompt creation of various database objects)
 1.c. keyHandler.class.php    : an object that supplies the interface for the package.
@@ -13,24 +12,27 @@ Content of package:
 2.a. loginForm.js : the encryption functions for the client side
 2.b. sha1.js      : a function for sha1 support for javascript
 
-3. exaple files:
-3.a. dbconnect.php : a simple function that supplies a mysql_link.
-3.b. login.php     : an example of how to use the keyHandler authentication
-3.c. loginForm.php : an example of how to use generate a form using the system.
+3.configs
+3.a config.ini : configurations file
 
-4. tempkeys.sql : the temp-keys table  
+4. exaple files:
+4.a. dbconnect.php : a simple function that supplies a mysql_link.
+4.b. login.php     : an example of how to use the keyHandler authentication
+4.c. loginForm.php : an example of how to use generate a form using the system.
+
+5. temp-keys.sql : the temp-keys table  
 
 =============
 Installation:
 =============
 
-1. insert the tempKeys table into your database.
-2. edit the config.php file, to match your users table.
+1. insert the temp-keys table into your database.
+2. edit the config.ini file, to match your users table.
 3. you need to supply the handler a mysql_link. in the example i do this with the dbconnect.php file, which can be used as well.
-    (you can use the interface to create db-access objects for other databases)
+    (you can use the interface to create DB-access objects for other databases)
 4. if your passwords are not encoded with sha1 in the database, change the third parameter in the authenticate call to false.
 
 use the examples i gave you to play around with it. notice that if you change the field names in the form, you need to change them in the JS file as well
 
 notice also, that i do not do input validation of any sort (other than check that the user name exists). you should make sure that you do, 
-and that you secure the input for sql injection and XSS (the library now alows you to set a function to run on input before sending it to the DB) 
+and that you secure the input for SQL injection and XSS (the library now allows you to set a function to run on input before sending it to the DB) 

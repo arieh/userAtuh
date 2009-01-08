@@ -20,7 +20,6 @@
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 require_once('dbaInterface.class.php');
-require_once('config.php');
 
 class userAuthDba implements dbaInterface {
 	
@@ -31,12 +30,20 @@ class userAuthDba implements dbaInterface {
 	private $_link = null;
 	
 	/**
+	 * @var array configurations for the database
+	 * @access private
+	 */
+	 
+	private $_configs = array();
+	
+	/**
 	 * a constructor for the object
 	 * 
 	 * @param mysql_link $link a link to the database
 	 */
     public function __construct(&$link){
     	$this->_link = $link;
+    	$this->_configs = parse_ini_file("configs/config.ini");
     }
     
     /**
@@ -49,17 +56,16 @@ class userAuthDba implements dbaInterface {
     public function insertKey($key){
     	$ip = getenv('REMOTE_ADDR');
     	
-    	$sql = "SELECT COUNT(*) as `c` FROM `tempKeys` WHERE `ip`='$ip'";
+    	$sql = "SELECT COUNT(*) as `c` FROM `temp-keys` WHERE `ip`='$ip'";
     	
     	$query = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	
     	if ((int)$result['c']==0){
-    		$sql = "INSERT INTO `tempKeys`(`ip`,`key`) VALUES ('$ip','$key')";
+    		$sql = "INSERT INTO `temp-keys`(`ip`,`key`) VALUES ('$ip','$key')";
     	}else{
-    		$sql = "UPDATE `tempKeys` SET `key`='$key' WHERE `ip`='$ip'";
+    		$sql = "UPDATE `temp-keys` SET `key`='$key' WHERE `ip`='$ip'";
     	}
-    	
     	mysql_query($sql) or die(mysql_error());
     }    
     /**
@@ -70,7 +76,10 @@ class userAuthDba implements dbaInterface {
      * @return string the key that was generated for this ip 
      */
     public function getKeyFromDB($ip){
-    	$sql    = "SELECT `key` FROM `tempKeys` WHERE `ip`='$ip'";
+    	
+    	if ($this->keyExists($ip)==false) return false;
+    	
+    	$sql    = "SELECT `key` FROM `temp-keys` WHERE `ip`='$ip'";
     	
     	$query  = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
@@ -87,15 +96,11 @@ class userAuthDba implements dbaInterface {
      * @return bool whether a user with this name exists
      */
     public function userExists($name){
-    	global $_auCnfgs_;
-    	global $_escapeInput_;
-    	global $_escapeFunction_;
-    	
-    	if ($_escapeInput_) $name = $_escapeFunction_($name);
-    	
+    	$dbConfigs = &$this->_configs;
+    	if ($dbConfigs['escapeInput']>0) $name = $dbConfigs['escapeFunction']($name);
     	$sql = "SELECT COUNT(*) as `c`
-					FROM `".$_auCnfgs_['usersTable']."`
-					WHERE `".$_auCnfgs_['uName']."` = '$name'";
+					FROM `".$dbConfigs['tableName']."`
+					WHERE `".$dbConfigs['nameField']."` = '$name'";
     	
     	$query = mysql_query($sql) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
@@ -112,19 +117,23 @@ class userAuthDba implements dbaInterface {
      * @return string the password for that user
      */
     public function getPass($name){
-    	global $_auCnfgs_;
-    	global $_escapeInput_;
-    	global $_escapeFunction_;
+    	$dbConfigs = &$this->_configs;
     	
-    	if ($_escapeInput_) $name = $_escapeFunction_($name);
+    	if ($dbConfigs['escapeInput']) $name = $dbConfigs['escapeFunction']($name);
     	
-    	$sql = "SELECT `".$_auCnfgs_['pass']."` as `pass`
-					FROM `".$_auCnfgs_['usersTable']."`
-					WHERE `".$_auCnfgs_['uName']."` = '$name'";
-    	
+    	$sql = "SELECT `".$dbConfigs['passField']."` as `pass`
+					FROM `".$dbConfigs['tableName']."`
+					WHERE `".$dbConfigs['nameField']."` = '$name'";
     	$query = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	return $result['pass'];
+    }
+    
+    protected function keyExists($ip){
+    	$sql = "SELECT COUNT(*) as `c` FROM `temp-keys` WHERE `ip`='$ip'";
+    	$query = mysql_query($sql,$this->_link) or die(mysql_error());
+    	$result = mysql_fetch_assoc($query);
+    	return ((int)$result['c']>0);
     }
 }
 ?>
