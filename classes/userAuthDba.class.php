@@ -43,7 +43,7 @@ class userAuthDba implements dbaInterface {
 	 */
     public function __construct(&$link){
     	$this->_link = $link;
-    	$this->_configs = parse_ini_file("configs/config.ini");
+    	$this->_configs = parse_ini_file("configs/userAtuh.ini");
     }
     
     /**
