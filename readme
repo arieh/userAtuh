@@ -4,9 +4,11 @@ userAuth v.0.2
 Content of package:
 ===================
 1. classes
-1.b. userAuthDba.class.php   : an object for handling database related actions
-1.b.1 dbaInterface.class.php : an interface for the database object (to prompt creation of various database objects)
-1.c. keyHandler.class.php    : an object that supplies the interface for the package.
+1.b. UserAuthDba.class.php         : an object for handling database related actions
+1.b.1 UserAtuhDbaSession.class.php : an extention to the above that uses session to store temporary keys instead of DB
+                                     this is extremly important for cases where several users are using the same router (almost always). its also much faster
+1.b.2 DbaInterface.class.php       : an interface for the database object (to prompt creation of various database objects)
+1.c. KeyHandler.class.php          : an object that supplies the interface for the package.
 
 2. js
 2.a. loginForm.js : the encryption functions for the client side
@@ -21,6 +23,8 @@ Content of package:
 4.c. loginForm.php : an example of how to use generate a form using the system.
 
 5. temp-keys.sql : the temp-keys table  
+
+6. Test suit - simple tests for PHPUnit for all classes
 
 =============
 Installation:
