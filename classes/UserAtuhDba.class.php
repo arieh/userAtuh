@@ -19,10 +19,9 @@
 	TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 	SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-require_once('dbaInterface.class.php');
+require_once('DbaInterface.class.php');
 
-class userAuthDba implements dbaInterface {
-
+class UserAtuhDba implements DbaInterface {
 	/**
 	 * @var string location of the config file
 	 */
@@ -44,7 +43,7 @@ class userAuthDba implements dbaInterface {
 	
 	/**
 	 * a constructor for the object
-	 * 
+	 *
 	 * @param mysql_link $link a link to the database
 	 */
     public function __construct(&$link,$ini=''){
@@ -55,13 +54,13 @@ class userAuthDba implements dbaInterface {
     
     /**
      * insertes the key that was generated for this session into the database
-     * 
+     *
      * @param string $key a random key
-     * 
+     *
      * @access public
      */
     public function insertKey($key){
-    	$ip = getenv('REMOTE_ADDR');
+    	$ip = $_SERVER['REMOTE_ADDR'];
     	
     	$sql = "SELECT COUNT(*) as `c` FROM `temp-keys` WHERE `ip`='$ip'";
     	
@@ -74,15 +73,16 @@ class userAuthDba implements dbaInterface {
     		$sql = "UPDATE `temp-keys` SET `key`='$key' WHERE `ip`='$ip'";
     	}
     	mysql_query($sql) or die(mysql_error());
-    }    
+    }
     /**
      * retrives the last key that was stored for a specific ip
-     * 
+     *
      * @param string $ip an ip address
      * @access public
-     * @return string the key that was generated for this ip 
+     * @return string the key that was generated for this ip
      */
-    public function getKeyFromDB($ip){
+    public function getKey(){
+    	$ip =  $_SERVER['REMOTE_ADDR'];
     	
     	if ($this->keyExists($ip)==false) return false;
     	
@@ -95,9 +95,9 @@ class userAuthDba implements dbaInterface {
     
     /**
      * checks if a specific user exists
-     * 
+     *
      * @param string $name a user name
-     * 
+     *
      * @uses $GLOBALS['_suCnfgs_'] a global variable that holds database structure information
      * @access public
      * @return bool whether a user with this name exists
@@ -118,7 +118,7 @@ class userAuthDba implements dbaInterface {
      * retrives a password from the database for a specific user
      *
      * @param string $name a user name
-     * 
+     *
      * @uses $GLOBALS['_suCnfgs_'] a global variable that holds database structure information
      * @access public
      * @return string the password for that user
@@ -136,7 +136,7 @@ class userAuthDba implements dbaInterface {
     	return $result['pass'];
     }
     
-    protected function keyExists($ip){
+    public function keyExists($ip){
     	$sql = "SELECT COUNT(*) as `c` FROM `temp-keys` WHERE `ip`='$ip'";
     	$query = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
