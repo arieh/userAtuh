@@ -8,12 +8,24 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
         $_SERVER['REMOTE_ADDR'] = '';
     }
     
+    public function getHandler($use_ini = false){
+        if ($use_ini){
+            return new UserAtuhDba($this->db,'configs/userAtuh.ini');
+        }
+        
+        return new UserAtuhDba($this->db,array(
+            'tableName' => 'users'
+            , 'nameField' => 'name'
+            , 'passField' => 'pass'
+        ));
+    }
+    
     /**
      * @dataProvider provideIPs
      */
     public function testKeyExists($ip){
         $this->setUpDB();
-        $target = new UserAtuhDba($this->db);
+        $target =$this->getHandler();
         $this->assertTrue($target->keyExists($ip));
     }
     
@@ -31,7 +43,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
      */
     public function testKeyExistsReturnsFalse($ip){
         $this->setUpDB();
-        $target = new UserAtuhDba($this->db);
+        $target =$this->getHandler();
         $this->assertFalse($target->keyExists($ip));
     }
     
@@ -54,7 +66,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
         
         $_SERVER['REMOTE_ADDR'] = $ip;
         
-        $target = new UserAtuhDba($db);
+        $target = $this->getHandler();
         
         $this->assertEquals($key,$target->getKey());
     }
@@ -68,7 +80,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
         
         $_SERVER['REMOTE_ADDR'] = $ip;
         
-        $target = new UserAtuhDba($this->db);
+        $target =$this->getHandler();
         
         $target->insertKey($key);
         
@@ -98,7 +110,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
     public function testUserExistsOK($name){
         $this->setUpDB();
         
-        $target = new UserAtuhDba($this->db);
+        $target =$this->getHandler();
         
         $this->assertTrue($target->userExists($name));
     }
@@ -109,7 +121,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
     public function testUserExistsBad($name){
         $this->setUpDB();
         
-        $target = new UserAtuhDba($this->db);
+        $target =$this->getHandler();
         
         $this->assertFalse($target->userExists($name));
     }
@@ -138,7 +150,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
     public function testGetPass($name,$pass){
         $this->setUpDB();
         
-        $target = new UserAtuhDba($this->db);
+        $target =$this->getHandler();
         
         $this->assertEquals($target->getPass($name),$pass);
     }
@@ -159,7 +171,7 @@ class UserAtuhDbaTest extends UserAtuhTestCase{
     public function testPassBadUser($name){
         $this->setUpDB();
         
-        $target = new UserAtuhDba($this->db);
+        $target = $this->getHandler();
         
         $target->getPass($name);
     }
