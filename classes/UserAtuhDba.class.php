@@ -23,11 +23,6 @@ require_once('DbaInterface.class.php');
 
 class UserAtuhDba implements DbaInterface {
 	/**
-	 * @var string location of the config file
-	 */
-	private $_configLocation = "configs/userAtuh.ini";
-	
-	/**
 	 * @var mysql_link a link to the database
 	 * @access private
 	 */
@@ -45,11 +40,34 @@ class UserAtuhDba implements DbaInterface {
 	 * a constructor for the object
 	 *
 	 * @param mysql_link $link a link to the database
+	 * @param mixed $conf configuration data. can be a string - a path to a vaid ini file, or an array with the requierd associative data
 	 */
-    public function __construct(&$link,$ini=''){
+    public function __construct(&$link,$conf){
     	$this->_link = $link;
-    	if (is_string($ini) && @file_exists($ini)) $this->_configs = parse_ini_file($ini);
-    	else $this->_configs = parse_ini_file($this->_configLocation);
+    	if (is_string($conf) && @file_exists($cong)) $this->_configs = parse_ini_file($conf);
+    	elseif (is_array($conf)){
+    	    $wanted_keys = array('tableName','nameField','passField');
+    	    $not_available = array();
+    	    foreach($wanted_keys as $key){
+    	        if (!array_key_exists($key,$conf)) $not_available[]=$key;
+    	    }
+    	    
+    	    if ($not_available){
+    	        throw new InvalidArgumentException("Config array missing the following settings:".implode(',',$not_available));
+    	    }
+    	    
+    	    if (array_key_exists('escapeInput',$conf)){
+    	        if (!array_key_exists('escapeFunction',$conf)){
+    	            throw new InvalidArgumentException("Escaping requested without suppllying and excaping method");
+    	        }
+    	    }else{
+    	        $conf['escapeInput'] = false;
+    	    }
+    	    
+    	    $this->_configs = $conf;
+    	}else{
+    	    throw new InvalidArgumentException("No Configuratsion was set");
+    	}
     }
     
     /**
@@ -103,11 +121,10 @@ class UserAtuhDba implements DbaInterface {
      * @return bool whether a user with this name exists
      */
     public function userExists($name){
-    	$dbConfigs = &$this->_configs;
-    	if ($dbConfigs['escapeInput']>0) $name = $dbConfigs['escapeFunction']($name);
+    	if ($this->_configs['escapeInput']>0) $name = call_user_func_array($this->_configs['escapeFunction'],array($name));
     	$sql = "SELECT COUNT(*) as `c`
-					FROM `".$dbConfigs['tableName']."`
-					WHERE `".$dbConfigs['nameField']."` = '$name'";
+					FROM `".$this->_configs['tableName']."`
+					WHERE `".$this->_configs['nameField']."` = '$name'";
     	
     	$query = mysql_query($sql) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
@@ -124,13 +141,11 @@ class UserAtuhDba implements DbaInterface {
      * @return string the password for that user
      */
     public function getPass($name){
-    	$dbConfigs = &$this->_configs;
+    	if ($this->_configs['escapeInput']) $name = call_user_func_array($this->_configs['escapeFunction'],array($name));
     	
-    	if ($dbConfigs['escapeInput']) $name = $dbConfigs['escapeFunction']($name);
-    	
-    	$sql = "SELECT `".$dbConfigs['passField']."` as `pass`
-					FROM `".$dbConfigs['tableName']."`
-					WHERE `".$dbConfigs['nameField']."` = '$name'";
+    	$sql = "SELECT `".$this->_configs['passField']."` as `pass`
+					FROM `".$this->_configs['tableName']."`
+					WHERE `".$this->_configs['nameField']."` = '$name'";
     	$query = mysql_query($sql,$this->_link) or die(mysql_error());
     	$result = mysql_fetch_assoc($query);
     	return $result['pass'];
