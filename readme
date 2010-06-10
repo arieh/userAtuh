@@ -38,7 +38,11 @@ Installation:
 
 use the examples i gave you to play around with it. notice that if you change the field names in the form, you need to change them in the JS file as well
 
-if you use a different folder structure, supply the keyHandler the location of the ini file (as done in the example).
+if you use a different folder structure, supply the KeyHandler the location of the ini file (as done in the example).
 
 notice also, that i do not do input validation of any sort (other than check that the user name exists). you should make sure that you do, 
-and that you secure the input for SQL injection and XSS (the library now allows you to set a function to run on input before sending it to the DB) 
+and that you secure the input for SQL injection and XSS (the library now allows you to set a function to run on input before sending it to the DB).
+
+UserAtuhDba now requiers you to supply configuration data in one of 2 ways:
+1. a path to a valid ini file.
+2. an assosiative array that has the same configurations (although you don't have to have escaping paramaters for it to work). This is the only way to call static methods for escaping input. 
