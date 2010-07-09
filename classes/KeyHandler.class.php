@@ -25,7 +25,7 @@ class KeyHandler {
 	/**
 	 * @var int version number
 	 */
-	private $_version = 0.6;
+	private $_version = 1.0;
 
 	/**
 	 * @var string a random key holder

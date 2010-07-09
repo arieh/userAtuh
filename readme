@@ -17,12 +17,13 @@ Content of package:
 3.configs
 3.a config.ini : configurations file
 
-4. exaple files:
+4. Demo:
 4.a. dbconnect.php : a simple function that supplies a mysql_link.
-4.b. login.php     : an example of how to use the keyHandler authentication
-4.c. loginForm.php : an example of how to use generate a form using the system.
+4.b. login-db.php     : an example of how to use the KeyHandler authentication using the DB store class (UserAtuhDba)
+4.c. login-session.php : same as above only using the session store (UserAtuhDbaSession)
+4.d. loginForm.php : an example of how to use generate a form using the system.
 
-5. temp-keys.sql : the temp-keys table  
+5. SQL - temp-keys.sql : the temp-keys table (only needed if you plan to use the DB store, which is not neccessary as of now)  
 
 6. Test suit - simple tests for PHPUnit for all classes
 

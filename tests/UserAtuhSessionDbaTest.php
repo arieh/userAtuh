@@ -5,7 +5,6 @@ require_once dirname(__FILE__) . '/../classes/UserAtuhDbaSession.class.php';
 class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
     public function setUp(){
         $_SESSION[UserAtuhDbaSession::SESSION_NAME] = '';
-        
     }
     
     /**
