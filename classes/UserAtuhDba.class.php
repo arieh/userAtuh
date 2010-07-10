@@ -42,9 +42,9 @@ class UserAtuhDba implements DbaInterface {
 	 * @param mysql_link $link a link to the database
 	 * @param mixed $conf configuration data. can be a string - a path to a vaid ini file, or an array with the requierd associative data
 	 */
-    public function __construct(&$link,$conf){
+    public function __construct(&$link,$conf=''){
     	$this->_link = $link;
-    	if (is_string($conf) && @file_exists($cong)) $this->_configs = parse_ini_file($conf);
+    	if (is_string($conf) && @file_exists($conf)) $this->_configs = parse_ini_file($conf);
     	elseif (is_array($conf)){
     	    $wanted_keys = array('tableName','nameField','passField');
     	    $not_available = array();

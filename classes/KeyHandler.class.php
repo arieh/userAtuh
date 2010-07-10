@@ -39,16 +39,20 @@ class KeyHandler {
 	 */
 	 
 	private $_dba = null;
+	
+	private $_hash_func = false;
     
     /**
      * constructor for the class
      *
      * @param mixed $link a database link (should be mysql_link)
+     * @param array|string $hash_func a function or method that is used to hash the passwords on the database
      *
      * @access public
      */
-    public function __construct(DbaInterface $db){
+    public function __construct(DbaInterface $db, $hash_func = false){
     	$this->_dba = $db;
+    	$this->_hash_func = $hash_func;
     	
     	$rand = time()+rand(0,10000)+'salt';
     	$this->_key = sha1(substr($rand,rand(0,6),rand(6,10)));
@@ -81,12 +85,11 @@ class KeyHandler {
      *
      * @param string $name        user name
      * @param string $encodedPass the encoded password
-     * @param bool   $sha1        wheater or not the passwords in the db are encoded with sha1 or not
      *
      * @access public
      * @return bool wheather the encoded key is valid
      */
-    public function authenticate($name,$encodedPass,$sha1=true){
+    public function authenticate($name,$encodedPass){
     		//get the last key that was generated for this session
     	
     	$key  = $this->_dba->getKey();
@@ -98,7 +101,7 @@ class KeyHandler {
     	$pass = $this->_dba->getPass($name);
     	
     		//make sure password is hashed
-    	if (!$sha1) $pass = sha1($pass);
+    	if ($this->_hash_func) $pass = call_user_func_array($this->_hash_func,array($pass));
     	
     		//create a hashed string from the date collected
 		$encoded = sha1(sha1($pass.$name.$key));
