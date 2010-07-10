@@ -31,19 +31,30 @@ Content of package:
 Installation:
 =============
 
-1. insert the temp-keys table into your database.
-2. edit the config.ini file, to match your users table.
-3. you need to supply the handler a mysql_link. in the example i do this with the dbconnect.php file, which can be used as well.
-    (you can use the interface to create DB-access objects for other databases)
-4. if your passwords are not encoded with sha1 in the database, change the third parameter in the authenticate call to false.
+Creating the login Form:
+------------------------
+Server Side:
+1. If you plan on using the built in DBAs, edit the ini file to match your users table.
+2. If you plan on using the database to store your temp keys (UserAtuhDba) create a temp-keys table using the supplied sql file.
+3. Instantiate the classes:
+    3.a The built in DBAs require you to pass a valid mysql link resource, and a path to the ini file / an associative array containing the same keys as the ini file.
+    3.b The KeyHandler require the first paramater to be a UserAtuhDbaI instance. The second isn't usualy needed. It is to be used if you want to supply a secondary 
+        hashing mechanism on the client-side. If you do, add a corresponding function and pass it to the constructor (same possible options as call_user_func).
+4. For creating the login form, use the getKey method.
 
-use the examples i gave you to play around with it. notice that if you change the field names in the form, you need to change them in the JS file as well
+Client Side:
+5. On the client side - use the JS configurations to specify a different frm structure. You can also change the method used to hash the password. This is important if 
+   you store your passwords in another way than a simple sha1 hash, or if you want to supply an additional hashing mechanism (the econd should be the one supplied to the
+   KeyHandler constructor . 
+   (you can find the config options in the unminified version of UserAtuh.js. It is recomended that you do not override them in the surce code). 
+6. If you are not using the minified version, make sure you include the sha1.js file as well. 
+7. The login form should have the setEncrypt function attached to his onsubmit event.
 
-if you use a different folder structure, supply the KeyHandler the location of the ini file (as done in the example).
-
-notice also, that i do not do input validation of any sort (other than check that the user name exists). you should make sure that you do, 
-and that you secure the input for SQL injection and XSS (the library now allows you to set a function to run on input before sending it to the DB).
-
-UserAtuhDba now requiers you to supply configuration data in one of 2 ways:
-1. a path to a valid ini file.
-2. an assosiative array that has the same configurations (although you don't have to have escaping paramaters for it to work). This is the only way to call static methods for escaping input. 
+Authentication the form:
+-------------------------
+1. 1st, the library supplies a special POST var to indicate the javascript was used. by default that variables name will be verify, though you can change it in the js conf.
+   If JS was used, it's value will be set to 'true'.
+2. After instantiating the classes (same as the form creation), simply call the authenticate method with the supplied user name and encrypted hash (by default this will be $_POST['enc']
+   but you can costumize it on the JS conf). The method will return true if credentials are valid, false otherwise.
+   
+You can look at the demos to see a simple use example. you can also use the test suite to see other use examples.
