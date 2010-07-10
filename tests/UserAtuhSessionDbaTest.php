@@ -7,13 +7,21 @@ class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
         $_SESSION[UserAtuhDbaSession::SESSION_NAME] = '';
     }
     
+    protected function getHandler(){
+        return new UserAtuhDbaSession( $this->db,array(
+            'tableName' => 'users'
+            , 'nameField' => 'name'
+            , 'passField' => 'pass'
+        ));
+    }
+    
     /**
      * @dataProvider provideKeys
      */
     public function testGetKey($key){
         $_SESSION[UserAtuhDbaSession::SESSION_NAME] = $key;
         
-        $target = new userAtuhDbaSession($this->db);
+        $target = $this->getHandler();
         
         $this->assertEquals($key,$target->getKey());
     }
@@ -24,7 +32,7 @@ class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
     public function testInsertKey($key){
         $this->setUpDB();
         
-        $target = new userAtuhDbaSession($this->db);
+        $target = $this->getHandler();
         
         $target->insertKey($key);
         
@@ -49,7 +57,7 @@ class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
     public function testUserExistsOK($name){
         $this->setUpDB();
         
-        $target = new UserAtuhDbaSession($this->db);
+        $target = $this->getHandler();
         
         $this->assertTrue($target->userExists($name));
     }
@@ -60,7 +68,7 @@ class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
     public function testUserExistsBad($name){
         $this->setUpDB();
         
-        $target = new UserAtuhDbaSession($this->db);
+        $target = $this->getHandler();
         
         $this->assertFalse($target->userExists($name));
     }
@@ -89,7 +97,7 @@ class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
     public function testGetPass($name,$pass){
         $this->setUpDB();
         
-        $target = new UserAtuhDbaSession($this->db);
+        $target = $this->getHandler();
         
         $this->assertEquals($target->getPass($name),$pass);
     }
@@ -110,7 +118,7 @@ class UserAtuhDbaSessionSessionTest extends UserAtuhTestCase{
     public function testPassBadUser($name){
         $this->setUpDB();
         
-        $target = new UserAtuhDbaSession($this->db);
+        $target = $this->getHandler();
         
         $target->getPass($name);
     }
